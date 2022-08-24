@@ -3,9 +3,7 @@ using UnityStandardAssets.CrossPlatformInput;
 
 public class PlayerController1 : MonoBehaviour {
 
-    [HideInInspector] public Rigidbody2D rigidBody; // H.I.I permite almacenar la modific. del
-    // obj o var en tiempo de ejecución tras Stop, de otro modo, al salir de la ejec., la var
-    // recupera su valor original antes de ejecutar Play
+    [HideInInspector] public Rigidbody2D rigidBody;
 
     public float moveSpeed;
 
@@ -26,64 +24,52 @@ public class PlayerController1 : MonoBehaviour {
 
     private bool isShooting;
 
-    private void Awake() // Ejecuta código antes del primer frame 
+    private void Awake()
     {
-        rigidBody = GetComponent<Rigidbody2D>(); // Inicializa la var asignada en el inspector
+        rigidBody = GetComponent<Rigidbody2D>();
     }
 
-    void Start() // Primer frame, ejecuta codigo
+    void Start()
     {
         isJumping = false;
-        isDead = false; // Realmente no se usa
-        isShooting = false; // Tampoco este
+        isDead = false;
+        isShooting = false;
     }
 
-    private void LateUpdate() // similar a Update() (Upd. se ejecuta 1 vez por cada frame)
-    // LateUpdate se ejecuta después de cada ejecución de Update(), LU() es recomendable para
-    // controlar el mov. de la cámara y evitar cortes de imagen
-    // FixedUpdate() se ejecuta una o varias veces antes de 1 sola ejecución de Update()
-    // https://docs.unity3d.com/ScriptReference/MonoBehaviour.FixedUpdate.html 
+    private void LateUpdate() 
     {
-        if (!isDead)    // si no está muerto
+        if (!isDead)    
         {
-            // Axis que controlan inputs, configurables en Edit> Project settings> Input manager
             h = Input.GetAxisRaw("Horizontal") * horizontalSpeed * Time.deltaTime;
             v = Input.GetAxisRaw("Jump");
 
+            this.gameObject.transform.Translate(h, 0.0f, 0.0f);
 
-            this.gameObject.transform.Translate(h, 0.0f, 0.0f); // Aplicar en el eje X
-
-
-            // Mayor a cero se mueve a un lado, y menor hacia el otro
             if (h > 0.001f)
             {
                 gameObject.transform.GetComponent<SpriteRenderer>().flipX = false;
             }
             else if (h < -0.001f)
             {
-                //  Invierte eje x del sprite player si la fuerza se aplica al otro lado
                 gameObject.transform.GetComponent<SpriteRenderer>().flipX = true;
             }
 
-
-            if (!isJumping) //  Si no está saltando, puede saltar 
+            if (!isJumping)
             {
                 if (v > 0)
                 {
-                    this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0.0f, verticalStrength); // aplico fuerza
+                    this.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(0.0f, verticalStrength);
 
-                    isJumping = true; // Estoy saltando, por lo que no puedo saltar más
+                    isJumping = true;
                 }
             }
         }
 
-        // Añadir condición de muerte de player y isDead = true
+        // add dieing condition for player y isDead = true
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        //  Cuando objetos con Coll.2D y etiquetas Floor y Player están chocando, se invoca el evento
-        // Para que esto funcione correctamente, a parte de Coll.2D al menos 1 de los dos obj debe tener un rigidbody2D (cuidado con poner variables 3D a obj. 2D, esto no funcionara
         if (collision.gameObject.tag == "Floor") isJumping = false;
     }
 }
